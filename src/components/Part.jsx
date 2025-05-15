@@ -1,6 +1,6 @@
 import React from "react";
 
-export default function Part({ part }) {
+export default function Part({ part, exercisesSum }) {
   return (
     <div>
       <p>
