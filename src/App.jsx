@@ -14,9 +14,12 @@ function App() {
       name: newName,
     };
 
+    if (person.some((p) => p.name === newName)) {
+      alert(`${newName} is already added to phonebook`);
+      setNewName("");
+      return;
+    }
     setPerson([...person, newNameObj]);
-    // setPerson(person.concat(newNameObj));
-
     setNewName("");
   };
 
@@ -30,8 +33,8 @@ function App() {
         <button type="submit">add</button>
       </form>
       <h2>Numbers</h2>
-      {person.map((p) => (
-        <div>{p.name}</div>
+      {person.map((p, i) => (
+        <div key={i}>{p.name}</div>
       ))}
     </>
   );
