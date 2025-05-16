@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
-import Filter from "./Filter";
-import PersonForm from "./PersonForm";
-import Persons from "./Persons";
+import Filter from "./components/Filter";
+import PersonForm from "./components/PersonForm";
+import Persons from "./components/Persons";
 import axios from "axios";
 
 function App() {
@@ -11,9 +11,12 @@ function App() {
   const [newFilterName, setNewFilterName] = useState("");
 
   useEffect(() => {
-    axios.get("http://localhost:3001/persons").then((response) => {
-      setPerson(response.data);
-    });
+    axios
+      .get("http://localhost:3001/persons")
+      .then((response) => {
+        setPerson(response.data);
+      })
+      .catch((err) => console.log("Fail to get phonebook data", err));
   }, []);
 
   const onHandleChangeName = (event) => {
@@ -30,10 +33,9 @@ function App() {
 
   const onHandleSubmitName = (event) => {
     event.preventDefault();
-    const newNameObj = {
+    const newObj = {
       name: newName,
       number: newNumber,
-      id: person.length + 1,
     };
 
     if (person.some((p) => p.name === newName)) {
@@ -42,13 +44,24 @@ function App() {
       setNewNumber("");
       return;
     }
-    setPerson([...person, newNameObj]);
-    setNewName("");
-    setNewNumber("");
+
+    if(!newName || !newNumber) {
+      alert("Please fill in both name and number");
+      return;
+    }
+    
+    axios
+      .post("http://localhost:3001/persons", newObj)
+      .then((response) => {
+        setPerson(person.concat(response.data));
+        setNewName("");
+        setNewNumber("");
+      })
+      .catch((err) => console.log("Fail to create a new phonebook", err));
   };
 
-  const filterPersons = person.filter((p) =>
-    p.name.toLowerCase().includes(newFilterName.toLowerCase())
+  const filterPersons = person.filter(
+    (p) => p.name && p.name.toLowerCase().includes(newFilterName.toLowerCase())
   );
 
   return (
