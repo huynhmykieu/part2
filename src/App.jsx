@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import Filter from "./components/Filter";
 import PersonForm from "./components/PersonForm";
 import Persons from "./components/Persons";
-import axios from "axios";
+import personService from "./services/persons";
 
 function App() {
   const [person, setPerson] = useState([]);
@@ -11,10 +11,10 @@ function App() {
   const [newFilterName, setNewFilterName] = useState("");
 
   useEffect(() => {
-    axios
-      .get("http://localhost:3001/persons")
-      .then((response) => {
-        setPerson(response.data);
+    personService
+      .getPersons()
+      .then((initialPerson) => {
+        setPerson(initialPerson);
       })
       .catch((err) => console.log("Fail to get phonebook data", err));
   }, []);
@@ -31,7 +31,7 @@ function App() {
     setNewFilterName(event.target.value);
   };
 
-  const onHandleSubmitName = (event) => {
+  const addPerson = (event) => {
     event.preventDefault();
     const newObj = {
       name: newName,
@@ -45,15 +45,15 @@ function App() {
       return;
     }
 
-    if(!newName || !newNumber) {
+    if (!newName || !newNumber) {
       alert("Please fill in both name and number");
       return;
     }
-    
-    axios
-      .post("http://localhost:3001/persons", newObj)
-      .then((response) => {
-        setPerson(person.concat(response.data));
+
+    personService
+      .createPerson(newObj)
+      .then((returnPerson) => {
+        setPerson([...person, returnPerson]);
         setNewName("");
         setNewNumber("");
       })
@@ -72,7 +72,7 @@ function App() {
       <PersonForm
         onHandleChangeName={onHandleChangeName}
         onHandleChangeNumber={onHandleChangeNumber}
-        onHandleSubmitName={onHandleSubmitName}
+        addPerson={addPerson}
       />
       <h2>Numbers</h2>
       <Persons filterPersons={filterPersons} />

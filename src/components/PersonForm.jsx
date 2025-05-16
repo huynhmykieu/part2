@@ -1,8 +1,14 @@
 import React from "react";
 
-export default function PersonForm({ newName, newNumber, onHandleChangeName, onHandleChangeNumber, onHandleSubmitName }) {
+export default function PersonForm({
+  newName,
+  newNumber,
+  onHandleChangeName,
+  onHandleChangeNumber,
+  addPerson,
+}) {
   return (
-    <form onSubmit={onHandleSubmitName}>
+    <form onSubmit={addPerson}>
       <div>
         name: <input value={newName} onChange={onHandleChangeName} />
       </div>
