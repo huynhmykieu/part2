@@ -33,25 +33,46 @@ function App() {
 
   const addPerson = (event) => {
     event.preventDefault();
-    const newObj = {
-      name: newName,
-      number: newNumber,
-    };
-
-    if (person.some((p) => p.name === newName)) {
-      alert(`${newName} is already added to phonebook`);
-      setNewName("");
-      setNewNumber("");
-      return;
-    }
 
     if (!newName || !newNumber) {
       alert("Please fill in both name and number");
       return;
     }
 
+    const existingPerson = person.find((p) => p.name === newName);
+    if (existingPerson) {
+      const ok = confirm(
+        `${newName} is already added to phonebook, replace the old number with a new one?`
+      );
+
+      if (ok) {
+        const updatedPerson = {
+          ...existingPerson,
+          number: newNumber,
+        };
+        personService
+          .updatePerson(existingPerson.id, updatedPerson)
+          .then((returnedPerson) => {
+            setPerson(
+              person.map((p) =>
+                p.id === existingPerson.id ? returnedPerson : p
+              )
+            );
+            setNewName("");
+            setNewNumber("");
+          })
+          .catch((err) => console.log("Fail to update phonebook", err));
+      }
+      return;
+    }
+
+    const newPerson = {
+      name: newName,
+      number: newNumber,
+    };
+
     personService
-      .createPerson(newObj)
+      .createPerson(newPerson)
       .then((returnPerson) => {
         setPerson([...person, returnPerson]);
         setNewName("");
@@ -69,7 +90,7 @@ function App() {
     if (!personToDelete) return;
 
     const confirmDelete = confirm(`Delete ${personToDelete.name}?`);
-    if(!confirmDelete) return;
+    if (!confirmDelete) return;
 
     personService
       .deletePerson(id)
@@ -88,6 +109,8 @@ function App() {
         onHandleChangeName={onHandleChangeName}
         onHandleChangeNumber={onHandleChangeNumber}
         addPerson={addPerson}
+        newName={newName}
+        newNumber={newNumber}
       />
       <h2>Numbers</h2>
       <Persons filterPersons={filterPersons} deletePerson={deletePerson} />
