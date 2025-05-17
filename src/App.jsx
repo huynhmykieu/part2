@@ -64,6 +64,21 @@ function App() {
     (p) => p.name && p.name.toLowerCase().includes(newFilterName.toLowerCase())
   );
 
+  const deletePerson = (id) => {
+    const personToDelete = person.find((p) => p.id === id);
+    if (!personToDelete) return;
+
+    const confirmDelete = confirm(`Delete ${personToDelete.name}?`);
+    if(!confirmDelete) return;
+
+    personService
+      .deletePerson(id)
+      .then(() => {
+        setPerson(person.filter((p) => p.id !== id));
+      })
+      .catch((err) => console.log("Fail to delete a phonebook", err));
+  };
+
   return (
     <>
       <h2>Phonebook</h2>
@@ -75,7 +90,7 @@ function App() {
         addPerson={addPerson}
       />
       <h2>Numbers</h2>
-      <Persons filterPersons={filterPersons} />
+      <Persons filterPersons={filterPersons} deletePerson={deletePerson} />
     </>
   );
 }
