@@ -3,12 +3,14 @@ import Filter from "./components/Filter";
 import PersonForm from "./components/PersonForm";
 import Persons from "./components/Persons";
 import personService from "./services/persons";
+import "./App.css";
 
 function App() {
   const [person, setPerson] = useState([]);
   const [newName, setNewName] = useState("");
   const [newNumber, setNewNumber] = useState("");
   const [newFilterName, setNewFilterName] = useState("");
+  const [errorMessage, setErrorMessage] = useState(null);
 
   useEffect(() => {
     personService
@@ -60,6 +62,12 @@ function App() {
             );
             setNewName("");
             setNewNumber("");
+            setErrorMessage(
+              `${returnedPerson.name} updated ${returnedPerson.number}`
+            );
+            setTimeout(() => {
+              setErrorMessage(null);
+            }, 5000);
           })
           .catch((err) => console.log("Fail to update phonebook", err));
       }
@@ -77,6 +85,10 @@ function App() {
         setPerson([...person, returnPerson]);
         setNewName("");
         setNewNumber("");
+        setErrorMessage(`Added ${returnPerson.name}`);
+        setTimeout(() => {
+          setErrorMessage(null);
+        }, 5000);
       })
       .catch((err) => console.log("Fail to create a new phonebook", err));
   };
@@ -96,6 +108,10 @@ function App() {
       .deletePerson(id)
       .then(() => {
         setPerson(person.filter((p) => p.id !== id));
+        setErrorMessage(`Deleted ${personToDelete.name}`);
+        setTimeout(() => {
+          setErrorMessage(null);
+        }, 5000);
       })
       .catch((err) => console.log("Fail to delete a phonebook", err));
   };
@@ -103,6 +119,7 @@ function App() {
   return (
     <>
       <h2>Phonebook</h2>
+      {errorMessage && <div className="error">{errorMessage}</div>}
       <Filter onHandleChangeFilterName={onHandleChangeFilterName} />
       <h2>add a new</h2>
       <PersonForm
