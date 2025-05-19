@@ -4,6 +4,7 @@ import PersonForm from "./components/PersonForm";
 import Persons from "./components/Persons";
 import personService from "./services/persons";
 import "./App.css";
+import Notification from "./components/Notification";
 
 function App() {
   const [person, setPerson] = useState([]);
@@ -41,6 +42,7 @@ function App() {
       return;
     }
 
+    /** Update a person*/
     const existingPerson = person.find((p) => p.name === newName);
     if (existingPerson) {
       const ok = confirm(
@@ -62,18 +64,31 @@ function App() {
             );
             setNewName("");
             setNewNumber("");
-            setErrorMessage(
-              `${returnedPerson.name} updated ${returnedPerson.number}`
-            );
+            setErrorMessage({
+              text: `${returnedPerson.name} and ${returnedPerson.number} are updated`,
+              type: "success",
+            });
+            console.log("errorMessage", errorMessage);
+
             setTimeout(() => {
               setErrorMessage(null);
             }, 5000);
           })
-          .catch((err) => console.log("Fail to update phonebook", err));
+          .catch((err) => {
+            setErrorMessage({
+              text: `Info of ${existingPerson.name} has already been removed from server`,
+              type: "error",
+            });
+            setPerson(person.filter((p) => p.id !== existingPerson.id));
+            setTimeout(() => {
+              setErrorMessage(null);
+            }, 5000);
+          });
       }
       return;
     }
 
+    /** Create a new person*/
     const newPerson = {
       name: newName,
       number: newNumber,
@@ -85,12 +100,23 @@ function App() {
         setPerson([...person, returnPerson]);
         setNewName("");
         setNewNumber("");
-        setErrorMessage(`Added ${returnPerson.name}`);
+        setErrorMessage({
+          text: `Added ${returnPerson.name}`,
+          type: "success",
+        });
         setTimeout(() => {
           setErrorMessage(null);
         }, 5000);
       })
-      .catch((err) => console.log("Fail to create a new phonebook", err));
+      .catch(() => {
+        setErrorMessage({
+          text: `Fail to add a new person`,
+          type: "error",
+        });
+        setTimeout(() => {
+          setErrorMessage(null);
+        }, 5000);
+      });
   };
 
   const filterPersons = person.filter(
@@ -108,18 +134,31 @@ function App() {
       .deletePerson(id)
       .then(() => {
         setPerson(person.filter((p) => p.id !== id));
-        setErrorMessage(`Deleted ${personToDelete.name}`);
+      })
+      .then(() => {
+        setErrorMessage({
+          text: `Deleted ${personToDelete.name}`,
+          type: "success",
+        });
         setTimeout(() => {
           setErrorMessage(null);
         }, 5000);
       })
-      .catch((err) => console.log("Fail to delete a phonebook", err));
+      .catch((err) => {
+        setErrorMessage({
+          text: `Information of ${personToDelete.name} has already been removed from server`,
+          type: "error",
+        });
+        setTimeout(() => {
+          setErrorMessage(null);
+        }, 5000);
+      });
   };
 
   return (
     <>
       <h2>Phonebook</h2>
-      {errorMessage && <div className="error">{errorMessage}</div>}
+      <Notification message={errorMessage} />
       <Filter onHandleChangeFilterName={onHandleChangeFilterName} />
       <h2>add a new</h2>
       <PersonForm
