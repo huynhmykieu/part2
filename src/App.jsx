@@ -36,7 +36,7 @@ function App() {
         <input type="text" value={countryName} onChange={searchCountryName} />
       </form>
 
-      {tooManyCountriesMatch && (
+      {countryName && tooManyCountriesMatch && (
         <div>Too many matches, specify another filter</div>
       )}
 
