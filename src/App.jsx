@@ -4,6 +4,7 @@ import axios from "axios";
 function App() {
   const [countryName, setCountryName] = useState("");
   const [countries, setCountries] = useState([]);
+  const [selectedCountry, setSelectedCountry] = useState(null);
 
   const filteredCountries = countries.filter((country) =>
     country.name.common.toLowerCase().includes(countryName.toLowerCase())
@@ -25,6 +26,7 @@ function App() {
 
   const searchCountryName = (event) => {
     setCountryName(event.target.value);
+    setSelectedCountry(null);
   };
 
   return (
@@ -41,27 +43,35 @@ function App() {
       {tooFewCountriesMatch && (
         <div>
           {filteredCountries.map((country) => (
-            <div key={country.name.common}>{country.name.common}</div>
+            <div key={country.name.cca3}>
+              {country.name.common}
+              <button onClick={() => setSelectedCountry(country)}>Show</button>
+            </div>
           ))}
         </div>
       )}
 
-      {onlyOneCountryMatch &&
-        filteredCountries.map((country) => (
-          <div key={country.name.common}>
-            <h2>{country.name.common}</h2>
-            <p>Capital {country.capital}</p>
-            <p>Area {country.area}</p>
-            <h3>Languages</h3>
-            <ul>
-              {Object.values(country.languages).map((language) => (
-                <li key={language}>{language}</li>
-              ))}
-            </ul>
-            <img src={country.flags.png}></img>
-          </div>
-        ))}
+      {(onlyOneCountryMatch || selectedCountry) && (
+        <CountryDetail country={selectedCountry || filteredCountries[0]} />
+      )}
     </>
+  );
+}
+
+function CountryDetail({ country }) {
+  return (
+    <div>
+      <h2>{country.name.common}</h2>
+      <p>Capital {country.capital}</p>
+      <p>Area {country.area}</p>
+      <h3>Languages</h3>
+      <ul>
+        {Object.values(country.languages).map((language) => (
+          <li key={language}>{language}</li>
+        ))}
+      </ul>
+      <img src={country.flags.png}></img>
+    </div>
   );
 }
 
