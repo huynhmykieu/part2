@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import axios from "axios";
+import CountryDetail from "./components/CountryDetail";
 
 function App() {
   const [countryName, setCountryName] = useState("");
@@ -43,7 +44,7 @@ function App() {
       {tooFewCountriesMatch && (
         <div>
           {filteredCountries.map((country) => (
-            <div key={country.name.cca3}>
+            <div key={country.name.common}>
               {country.name.common}
               <button onClick={() => setSelectedCountry(country)}>Show</button>
             </div>
@@ -55,23 +56,6 @@ function App() {
         <CountryDetail country={selectedCountry || filteredCountries[0]} />
       )}
     </>
-  );
-}
-
-function CountryDetail({ country }) {
-  return (
-    <div>
-      <h2>{country.name.common}</h2>
-      <p>Capital {country.capital}</p>
-      <p>Area {country.area}</p>
-      <h3>Languages</h3>
-      <ul>
-        {Object.values(country.languages).map((language) => (
-          <li key={language}>{language}</li>
-        ))}
-      </ul>
-      <img src={country.flags.png}></img>
-    </div>
   );
 }
 
